@@ -1,12 +1,14 @@
 package com.example.controller;
 
-import com.datastax.oss.driver.api.core.cql.ResultSet;
+import com.example.dto.StudentDto;
+import com.example.dto.UpdateStudentRequestDto;
 import com.example.model.Student;
 import com.example.model.UpdateStudentRequest;
 import com.example.service.StudentService;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +17,7 @@ import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class StudentController {
 
     private final StudentService studentService;
@@ -25,18 +28,19 @@ public class StudentController {
 
 
     @Get("/find")
-    public List<Student> getAllUsers() {
+    public List<StudentDto> getAllUsers() {
+        log.info("Inside getAllUsers");
         return studentService.findAllUsers();
     }
 
     @Post("/save")
-    public Student saveStudent(@Body Student student) {
+    public StudentDto saveStudent(@Body StudentDto student) {
         studentService.insertStudent(student);
         return student;
     }
 
     @Get("find/{id}/{name}/{age}")
-    public Optional<Student> getUserById( Integer id ,String name, Integer age) {
+    public Optional<StudentDto> getUserById( Integer id ,String name, Integer age) {
         return studentService.findStudentById(id,name,age);
     }
 
@@ -47,18 +51,19 @@ public class StudentController {
 
 
     @Put("update/{id}/{name}/{age}")
-    public HttpResponse<?> updateStudent(
-            @PathVariable Integer id,
-            @PathVariable String name,
-            @PathVariable Integer age,
-            @Body UpdateStudentRequest updateStudentRequest) {
-        boolean updated = studentService.updateStudent(id, name, updateStudentRequest.getAddress(), age, updateStudentRequest.getGender());
+    public HttpResponse<?> updateStudent(@PathVariable Integer id,
+                                         @PathVariable String name,
+                                         @PathVariable Integer age,
+                                         @Body UpdateStudentRequestDto updateStudentRequestDto) {
+        boolean updated = studentService.updateStudent(id, name, updateStudentRequestDto.getAddress(),
+                age, updateStudentRequestDto.getGender());
+
         if (updated) {
             return HttpResponse.ok("updated suscussfully");
-
         } else {
             return HttpResponse.notFound();
         }
+
     }
 
     @Delete("delete/{id}/{name}/{age}")

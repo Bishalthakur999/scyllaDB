@@ -1,30 +1,18 @@
-package com.example.model;
-
+package com.example.dto;
 
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.serde.annotation.SerdeImport;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @AllArgsConstructor
-@Builder
+@Data
 @NoArgsConstructor
 @Introspected
 @SerdeImport
-public class Student {
-
-    private Integer id;
-
-    private String name;
-
+public class UpdateStudentRequestDto {
     private String address;
 
-    private Integer age;
-
     private String gender;
-
-
 }

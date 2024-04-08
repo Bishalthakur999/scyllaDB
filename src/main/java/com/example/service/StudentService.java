@@ -5,6 +5,8 @@ import com.datastax.oss.driver.api.core.CqlSessionBuilder;
 import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.Row;
+import com.example.dto.StudentDto;
+import com.example.exception.StudentNotFoundException;
 import com.example.model.Student;
 import jakarta.inject.Singleton;
 
@@ -26,7 +28,7 @@ public class StudentService {
         INSERT_STATEMENT = cqlSession.prepare(INSERT_QUERY);
     }
     public final static String INSERT_QUERY ="INSERT INTO mykeyspace.Student (id, name,address,age,gender) VALUES (?, ?,?,?,?)";
-    public final static String FIND_QUERY ="SELECT * FROM mykeyspace.Student WHERE id = ? and name = ? and age=?";
+    public final static String FIND_QUERY ="SELECT * FROM mykeyspace.Student WHERE id = ? and name = ? and age= ?";
 
     public final static String UPDATE_QUERY="UPDATE mykeyspace.Student SET address = ?, gender = ? WHERE id = ? and name = ? and age = ?";
 
@@ -43,16 +45,16 @@ public class StudentService {
 
    private final PreparedStatement findAllStatement;
 
-    public void insertStudent(Student student){
+    public void insertStudent(StudentDto student){
         var boundStatement = INSERT_STATEMENT.bind(student.getId(),student.getName(),student.getAddress(),student.getAge(),student.getGender());
          cqlSession.execute(boundStatement);
     }
 
-    public List<Student> findAllUsers() {
-        List<Student> stu = new ArrayList<>();
+    public List<StudentDto> findAllUsers() {
+        List<StudentDto> stu = new ArrayList<>();
         ResultSet rs = cqlSession.execute(findAllStatement.bind());
         rs.forEach(row -> {
-            Student student = new Student();
+            StudentDto student = new StudentDto();
             student.setId(row.getInt("id"));
             student.setName(row.getString("name"));
             student.setAddress(row.getString("address"));
@@ -63,11 +65,11 @@ public class StudentService {
         return stu;
     }
 
-    public Optional<Student> findStudentById(Integer id,String name,Integer age) {
+    public Optional<StudentDto> findStudentById(Integer id,String name,Integer age) {
         ResultSet rs = cqlSession.execute(findByIdStatement.bind(id,name,age));
         Row row = rs.one();
         if (row != null) {
-            Student student=new Student();
+            StudentDto student=new StudentDto();
             student.setId(row.getInt("id"));
             student.setName(row.getString("name"));
             student.setAddress(row.getString("address"));
@@ -75,7 +77,7 @@ public class StudentService {
             student.setGender(row.getString("gender"));
             return Optional.of(student);
         }
-        return Optional.empty();
+        throw new StudentNotFoundException("student not found with id:"+id);
     }
 
     public boolean updateStudent(Integer id, String name, String newAddress, Integer age, String newGender) {

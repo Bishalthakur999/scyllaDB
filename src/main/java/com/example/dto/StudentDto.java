@@ -1,5 +1,4 @@
-package com.example.model;
-
+package com.example.dto;
 
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.serde.annotation.SerdeImport;
@@ -14,8 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Introspected
 @SerdeImport
-public class Student {
-
+public class StudentDto {
     private Integer id;
 
     private String name;
@@ -25,6 +23,4 @@ public class Student {
     private Integer age;
 
     private String gender;
-
-
 }
