@@ -1,0 +1,56 @@
+syntax = "proto3";
+package com.example.grpc;
+option java_multiple_files = true;
+option java_package = "com.example.grpc";
+
+service StudentService {
+  rpc GetAllUsers (Empty) returns (StudentsList);
+  rpc FindByID(FindStudentRequest)returns(StudentDto);
+  rpc Save(CreateStudentRequest) returns(StudentDto);
+  rpc DeleteStudent(DeleteStudentRequest) returns(StudentDto);
+  rpc UpdateStudent(UpdateStudentRequest) returns(StudentDto);
+}
+
+message StudentDto {
+  int32 id = 1;
+  string email=2;
+  string name = 3;
+  string address = 4;
+  int32 age = 5;
+  string gender = 6;
+}
+message CreateStudentRequest {
+  int32 id = 1;
+  string email=2;
+  string name = 3;
+  string address = 4;
+  int32 age = 5;
+  string gender = 6;
+}
+
+message FindStudentRequest {
+  int32 id = 1;
+  string email=2;
+}
+
+message UpdateStudentRequest {
+  int32 id = 1;
+  string email=2;
+  string name = 3;
+  string address = 4;
+  int32 age = 5;
+  string gender = 6;
+
+}
+
+message DeleteStudentRequest {
+  int32 id = 1;
+  string email=2;
+}
+
+message StudentsList {
+  repeated StudentDto students = 1;
+}
+
+
+message Empty {}

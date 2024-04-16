@@ -1,6 +1,7 @@
 package com.example.model;
 
 
+import com.example.dto.StudentDto;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.serde.annotation.SerdeImport;
 import lombok.AllArgsConstructor;
@@ -25,6 +26,7 @@ public class Student {
     private Integer age;
 
     private String gender;
+
 
 
 }

@@ -1,6 +1,8 @@
 package com.example;
 
+
 import io.micronaut.runtime.Micronaut;
+
 
 public class Application {
 
@@ -10,5 +12,9 @@ public class Application {
         System.out.println("hello");
 
         Micronaut.run(Application.class, args);
+
+
+
+
     }
 }

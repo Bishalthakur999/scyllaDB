@@ -2,6 +2,8 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("io.micronaut.application") version "4.3.5"
     id("io.micronaut.aot") version "4.3.5"
+    //grpc ko plugin
+    id("com.google.protobuf") version "0.9.2"
 }
 
 version = "0.1"
@@ -9,22 +11,39 @@ group = "com.example"
 
 repositories {
     mavenCentral()
+
 }
 
+
 dependencies {
+//    implementation("com.oracle.coherence.ce:coherence")
+//    implementation("com.oracle.coherence.ce:coherence-java-client")
+//    implementation("io.micronaut.coherence:micronaut-coherence")
+//    implementation("io.micronaut.coherence:micronaut-coherence-grpc-client")
+    //grpc
+    implementation("io.micronaut.grpc:micronaut-grpc-runtime")
+    implementation("javax.annotation:javax.annotation-api")
+
     annotationProcessor("org.projectlombok:lombok")
     annotationProcessor("io.micronaut:micronaut-http-validation")
     annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
     implementation("io.micronaut.serde:micronaut-serde-jackson")
+    //scylladb
     implementation("io.micronaut.cassandra:micronaut-cassandra")
     compileOnly("io.micronaut:micronaut-http-client")
     compileOnly("org.projectlombok:lombok")
     runtimeOnly("ch.qos.logback:logback-classic")
     testImplementation("io.micronaut:micronaut-http-client")
-
+  //scylladb
     implementation 'com.datastax.oss:java-driver-core:4.13.0'
 
+    //modelmapper
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
 }
+
 
 
 application {
@@ -37,6 +56,24 @@ java {
 
 
 graalvmNative.toolchainDetection = false
+sourceSets {
+    main {
+        java {
+            srcDirs("build/generated/source/proto/main/grpc")
+            srcDirs("build/generated/source/proto/main/java")
+        }
+    }
+}
+
+protobuf {
+    protoc { artifact = "com.google.protobuf:protoc:3.23.4" }
+    plugins {
+        grpc { artifact = "io.grpc:protoc-gen-grpc-java:1.56.1" }
+    }
+    generateProtoTasks {
+        all()*.plugins { grpc {} }
+    }
+}
 micronaut {
     runtime("netty")
     testRuntime("junit5")

@@ -1,0 +1,31 @@
+syntax = "proto3";
+package com.example.grpc;
+option java_multiple_files = true;
+option java_package = "com.example.grpc";
+
+service CourseService{
+  rpc GetAllCourse(EmptyList) returns (CreateCourseRequest);
+  rpc FindCourseById(FindCourseRequest) returns (CreateCourseRequest);
+  rpc CreateCourse(CreateCourseRequest) returns(CreateCourseRequest);
+  rpc DeleteStudentById(FindCourseRequest) returns(EmptyList);
+
+
+}
+
+
+message CreateCourseRequest{
+  int32 cId=1;
+  string cName=2;
+  int32 cHrs=3;
+}
+
+message FindCourseRequest{
+  int32 cId=1;
+  string cName=2;
+}
+
+message CourseList{
+  repeated CreateCourseRequest courses=1;
+}
+
+message EmptyList{}

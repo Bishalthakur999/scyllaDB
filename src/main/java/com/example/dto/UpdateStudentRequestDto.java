@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @SerdeImport
 public class UpdateStudentRequestDto {
     private String address;
-
     private String gender;
+    private String name;
+    private String age;
 }
