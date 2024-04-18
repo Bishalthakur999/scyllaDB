@@ -1,8 +1,9 @@
-package com.example.dto;
+package com.example.entity;
 
 
+
+import com.example.grpc.Course;
 import com.example.grpc.CreateStudentRequest;
-import com.example.grpc.DeleteStudentRequest;
 import com.example.grpc.UpdateStudentRequest;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.serde.annotation.SerdeImport;
@@ -12,6 +13,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -19,7 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 @Introspected
 @SerdeImport
-public class StudentDto {
+public class Student {
     private Integer id;
 
     private String email;
@@ -32,11 +34,11 @@ public class StudentDto {
 
     private String gender;
 
-    private List<String> courseIds;
+    private List<Integer> courseIds;
 
 
-    public static StudentDto toModel(CreateStudentRequest model){
-        return StudentDto.builder()
+    public static Student toModel(CreateStudentRequest model){
+        return Student.builder()
                 .id(model.getId())
                 .email(model.getEmail())
                 .name(model.getName())
@@ -46,19 +48,21 @@ public class StudentDto {
                 .build();
     }
 
-    public static StudentDto toModelUpdate(UpdateStudentRequest model){
-        return StudentDto.builder()
+    public static Student toModelUpdate(UpdateStudentRequest model){
+        return Student.builder()
                 .id(model.getId())
                 .email(model.getEmail())
                 .name(model.getName())
                 .address(model.getAddress())
                 .age(model.getAge())
                 .gender(model.getGender())
+
+              .courseIds(model.getCoursesList().stream().map(Course::getCourseId).collect(Collectors.toList()))
                 .build();
     }
 
 
-    public static com.example.grpc.StudentDto toGrpc(StudentDto response) {//new instance banayara pathauna vo
+    public static com.example.grpc.StudentDto toGrpc(Student response) {//new instance banayara pathauna vo
         return  com.example.grpc.StudentDto.newBuilder()
                 .setId(response.getId())
                 .setEmail(response.getEmail())
@@ -66,7 +70,6 @@ public class StudentDto {
                 .setAddress(response.getAddress())
                 .setAge(response.getAge())
                 .setGender(response.getGender())
-
                 .build();
     }
 

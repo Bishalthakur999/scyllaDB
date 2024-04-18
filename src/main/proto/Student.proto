@@ -40,7 +40,7 @@ message UpdateStudentRequest {
   string address = 4;
   int32 age = 5;
   string gender = 6;
-
+  repeated Course courses=7;
 }
 
 message DeleteStudentRequest {
@@ -50,6 +50,10 @@ message DeleteStudentRequest {
 
 message StudentsList {
   repeated StudentDto students = 1;
+}
+
+message Course{
+  int32 course_id=1;
 }
 
 

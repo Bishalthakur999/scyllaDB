@@ -1,10 +1,14 @@
 package com.example.grpc;
 
-import com.example.dto.StudentDto;
+import com.example.entity.Student;
+import com.example.exception.NotFoundException;
+import com.example.studentservice.CourseDao;
 import com.example.studentservice.StudentService;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import jakarta.inject.Singleton;
+
+import java.util.List;
 
 
 @Singleton
@@ -13,8 +17,11 @@ public class StudentServiceImpl extends StudentServiceGrpc.StudentServiceImplBas
 
     private final StudentService studentService;
 
-    public StudentServiceImpl(StudentService studentService) {
+    private final CourseDao courseDao;
+
+    public StudentServiceImpl(StudentService studentService, CourseDao courseDao) {
         this.studentService = studentService;
+        this.courseDao = courseDao;
     }
 
     @Override
@@ -26,7 +33,7 @@ public class StudentServiceImpl extends StudentServiceGrpc.StudentServiceImplBas
 
             //converting from service dto to grpc dto.
             var grpcUserList = userList.stream()
-                    .map(StudentDto::toGrpc)
+                    .map(Student::toGrpc)
                     .toList();
 
 
@@ -58,7 +65,7 @@ public class StudentServiceImpl extends StudentServiceGrpc.StudentServiceImplBas
 //               return;
 //           }
 
-           var grpcStundet = StudentDto.toGrpc(user.get());
+           var grpcStundet = Student.toGrpc(user.get());
 
            responseObserver.onNext(grpcStundet);
        }catch (Exception e){
@@ -73,8 +80,8 @@ public class StudentServiceImpl extends StudentServiceGrpc.StudentServiceImplBas
     @Override
     public void save(CreateStudentRequest request, StreamObserver<com.example.grpc.StudentDto> responseObserver) {
         //database ma halako hai
-       var addedStudent= studentService.insertStudent(StudentDto.toModel(request));
-        responseObserver.onNext(StudentDto.toGrpc(addedStudent));
+       var addedStudent= studentService.insertStudent(Student.toModel(request));
+        responseObserver.onNext(Student.toGrpc(addedStudent));
         responseObserver.onCompleted();
     }
 
@@ -95,22 +102,27 @@ try {
         responseObserver.onCompleted();
     }
 
-    @Override
-    public void updateStudent(UpdateStudentRequest request, StreamObserver<com.example.grpc.StudentDto> responseObserver) {
 
+    @Override
+    public void updateStudent(UpdateStudentRequest request, StreamObserver<StudentDto> responseObserver) {
         try{
-            var studentDto = StudentDto.toModelUpdate(request);
-            StudentDto updatedStudent= studentService.updateStudent(
+            var studentDto = Student.toModelUpdate(request);
+
+            //cheak garna if provided courseId exist in course table
+            checkIfCourseExists(request.getCoursesList());
+            Student updatedStudent= studentService.updateStudent(
                     studentDto.getName(),
                     studentDto.getAddress(),
                     studentDto.getAge(),
                     studentDto.getGender(),
+                    studentDto.getCourseIds(),
                     studentDto.getId(),
                     studentDto.getEmail()
 
             );
+            // Student updatedStudent=studentService.updateStudent();
             // updated student lai rpc ma convert garako hai mula
-            com.example.grpc.StudentDto grpcUpdatedStudent = StudentDto.toGrpc(updatedStudent);
+            com.example.grpc.StudentDto grpcUpdatedStudent = Student.toGrpc(updatedStudent);
             responseObserver.onNext(grpcUpdatedStudent);
 
 
@@ -126,10 +138,15 @@ try {
 
     }
 
+    private void checkIfCourseExists(List<Course> courseIds) {
+        for (Course courses: courseIds){
+            boolean courseExists= courseDao.courseExists(courses.getCourseId());
+            if (!courseExists){
+               throw new NotFoundException("course with id: "+courses.getCourseId()+" doesnot exists.");
+            }
+        }
 
-
-
-
+    }
 
 
 }

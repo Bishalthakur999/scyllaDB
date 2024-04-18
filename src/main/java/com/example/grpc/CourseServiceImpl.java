@@ -1,6 +1,6 @@
 package com.example.grpc;
 
-import com.example.dto.Course;
+import com.example.entity.Course;
 import com.example.studentservice.CourseDao;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
@@ -36,7 +36,6 @@ public class CourseServiceImpl extends CourseServiceGrpc.CourseServiceImplBase{
         var createdCourse= courseDao.createCourse(courseModel);
         responseObserver.onNext(Course.toRpc(createdCourse));
         responseObserver.onCompleted();
-
 
         //super.createCourse(request, responseObserver);
     }

@@ -1,10 +1,11 @@
 package com.example.studentservice;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.cql.BoundStatement;
 import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.Row;
-import com.example.dto.Course;
+import com.example.entity.Course;
 import com.example.exception.NotFoundException;
 import jakarta.inject.Singleton;
 
@@ -22,6 +23,7 @@ public class CourseDaoImpl implements CourseDao {
         findByIdStatement=cqlSession.prepare(FIND_QUERY);
         findAllStatement=cqlSession.prepare(FIND_ALL);
         deleteByIdStatement=cqlSession.prepare(DELETE_QUERY);
+        existsByIdStatement=cqlSession.prepare(Exists_Query);
     }
 
     public static final String INSERT_QUERY="INSERT INTO mykeyspace.Course(cId,cName,cHrs) VALUES(?,?,?)";
@@ -31,11 +33,16 @@ public class CourseDaoImpl implements CourseDao {
     public static final String FIND_QUERY="SELECT * FROM mykeyspace.Course WHERE cId = ? and cName = ?";
 
     public static final String DELETE_QUERY="DELETE  FROM mykeyspace.Course WHERE cId = ? and cName = ? ";
+    public static final String Exists_Query ="SELECT * FROM mykeyspace.Course WHERE cId = ? ";
+
+
 
     public static PreparedStatement insertStatement;
     public static PreparedStatement findAllStatement;
     public static PreparedStatement findByIdStatement;
     public static PreparedStatement deleteByIdStatement;
+    public static PreparedStatement existsByIdStatement;
+
 
 
 
@@ -68,9 +75,9 @@ public class CourseDaoImpl implements CourseDao {
 
     @Override
     public Course findCouresById(Integer cId ,String cName) {
+           BoundStatement boundStatement =findByIdStatement.bind(cId,cName);
 
-
-          ResultSet course= cqlSession.execute(findByIdStatement.bind(cId,cName));
+          ResultSet course= cqlSession.execute(boundStatement);
           Row row=course.one();
 
           if(row !=null){
@@ -99,5 +106,15 @@ public class CourseDaoImpl implements CourseDao {
 
 
 
+    }
+
+    @Override
+    public boolean courseExists(int courseId) {
+        var boundStatement =existsByIdStatement.bind(courseId);
+        //BoundStatement boundStatement = existsByIdStatement.bind(courseId);
+            ResultSet resultSet = cqlSession.execute(boundStatement);
+            Row row = resultSet.one();
+            return row != null;
+            
     }
 }

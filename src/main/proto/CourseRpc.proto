@@ -8,8 +8,6 @@ service CourseService{
   rpc FindCourseById(FindCourseRequest) returns (CreateCourseRequest);
   rpc CreateCourse(CreateCourseRequest) returns(CreateCourseRequest);
   rpc DeleteStudentById(FindCourseRequest) returns(EmptyList);
-
-
 }
 
 

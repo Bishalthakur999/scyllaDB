@@ -3,3 +3,5 @@ CREATE table Student( id INT, email TEXT ,name TEXT,address TEXT,age INT,gender 
 DESCRIBE TABLE mykeyspace.Student;
 CREATE table Course( cId INT, cName TEXT,cHrs INT, PRIMARY KEY ((cId),cName));
 DESCRIBE TABLE mykeyspace.Course
+
+ALTER TABLE mykeyspace.student add courseIds INT ;
